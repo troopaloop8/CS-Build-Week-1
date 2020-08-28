@@ -7,6 +7,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background: linear-gradient(-45deg, #EE7752, #E73C7E, #23A6D5, #23D5AB);
     background-size: 200% 200%;
+  
 }
 
 code {
@@ -27,6 +28,8 @@ code {
 }
 .generations {
   font-size: 2rem;
+  position: relative;
+  left: 50px;
 }
 
 .white {
@@ -36,6 +39,8 @@ code {
 .flex-cols {
   display: flex;
   margin: 5px auto;
+  position: relative;
+  left: 50px;
   
 }
 .toggles {
@@ -43,6 +48,7 @@ code {
     flex-flow: column nowrap;
     justify-content: space-evenly;
     margin: -0% 2% 2% 2%;
+
   }
 .rules {
   width: 20%;
