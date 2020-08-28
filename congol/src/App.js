@@ -12,6 +12,7 @@ import {
 } from "./preloads";
 import Rules from "./Explainer";
 
+
 const operations = [
   [0, 1],
   [0, -1],
@@ -25,56 +26,7 @@ const operations = [
 
 const getRandomColor = () => {
   const colorArray = [
-    "#FF6633",
-    "#FFB399",
-    // "#FF33FF",
-    // "#FFFF99",
-    // "#00B3E6",
-    // "#E6B333",
-    // "#3366E6",
-    // "#999966",
-    // "#99FF99",
-    // "#B34D4D",
-    // "#80B300",
-    // "#809900",
-    // "#E6B3B3",
-    // "#6680B3",
-    // "#66991A",
-    // "#FF99E6",
-    // "#CCFF1A",
-    // "#FF1A66",
-    // "#E6331A",
-    // "#33FFCC",
-    // "#66994D",
-    // "#B366CC",
-    // "#4D8000",
-    // "#B33300",
-    // "#CC80CC",
-    // "#66664D",
-    // "#991AFF",
-    // "#E666FF",
-    // "#4DB3FF",
-    // "#1AB399",
-    // "#E666B3",
-    // "#33991A",
-    // "#CC9999",
-    // "#B3B31A",
-    // "#00E680",
-    // "#4D8066",
-    // "#809980",
-    // "#E6FF80",
-    // "#1AFF33",
-    // "#999933",
-    // "#FF3380",
-    // "#CCCC00",
-    // "#66E64D",
-    // "#4D80CC",
-    // "#9900B3",
-    // "#E64D66",
-    // "#4DB380",
-    // "#FF4D4D",
-    // "#99E6E6",
-    // "#6666FF",
+    "#EE7752", "#E73C7E", "#23A6D5", "#23D5AB"
   ];
   return colorArray[Math.floor(Math.random() * colorArray.length)];
 };
@@ -159,11 +111,9 @@ const App = () => {
 
   return (
     <>
-      <div className="white">Conway's Game of Life</div>
+      <div className="white title centered">Conway's Game of Life</div>
       <div className="generations">
-        <div className="white">generation: {generation}</div>
-      </div>
-      <div className="controls">
+        <div className="white subtitle">generation: {generation}</div><div className="controls">
         <button
           onClick={() => {
             setRunning(!running);
@@ -185,6 +135,8 @@ const App = () => {
           clear
         </button>
       </div>
+      </div>
+      
       <div className="flex-cols">
         <div className="grid">
           {" "}
@@ -211,7 +163,7 @@ const App = () => {
                   style={{
                     width: 20,
                     height: 20,
-                    backgroundColor: grid[i][k] ? "red" : undefined,
+                    backgroundColor: grid[i][k] ? getRandomColor() : "#242424a4",
                     border: "1px solid grey",
                   }}
                 />
@@ -239,7 +191,7 @@ const App = () => {
           >
             random
           </button>
-          <div className="white">Oscillators</div>
+          <div className="white center">Oscillators</div>
           <button
             onClick={() => {
               if (!running) {
@@ -273,7 +225,7 @@ const App = () => {
           >
             other oscillators
           </button>
-          <div className="white">Stills</div>
+          <div className="white center">Stills</div>
           <button
             onClick={() => {
               if (!running) {
@@ -285,7 +237,7 @@ const App = () => {
           >
             stills
           </button>
-          <div className="white">Gliders</div>
+          <div className="white center">Gliders</div>
           <button
             onClick={() => {
               if (!running) {
@@ -330,7 +282,7 @@ const App = () => {
           >
             hwss
           </button>
-          <div className="white">Speeds</div>
+          <div className="white center">Speeds</div>
           <button onClick={() => changeSpeed(25)}>hyper mode</button>
           <button onClick={() => changeSpeed(100)}>fast mode</button>
           <button onClick={() => changeSpeed(500)}>normal mode</button>
