@@ -12,3 +12,33 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.white {
+  color: white;
+}
+
+.flex-cols {
+  display: flex;
+  
+}
+.toggles {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: space-evenly;
+    margin: -0% 2% 2% 2%;
+  }
+.rules {
+  width: 20%;
+}
+
+button {
+  width: 100px;
+  height: 50px;
+  padding: 5px;
+  background-color: yellow;
+  color: black;
+  
+}
+button.controls {
+  padding: 5px;
+}

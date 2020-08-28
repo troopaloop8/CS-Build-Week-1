@@ -1,9 +1,16 @@
 import React, { useState, useCallback, useRef } from "react";
 import produce from "immer";
-import {pulsar, pentaDecathlon, oscillators, stills, glider, lwss, mwss, hwss} from "./preloads"
-
-const numRows = 25;
-const numCols = 25;
+import {
+  pulsar,
+  pentaDecathlon,
+  oscillators,
+  stills,
+  glider,
+  lwss,
+  mwss,
+  hwss,
+} from "./preloads";
+import Rules from "./Explainer";
 
 const operations = [
   [0, 1],
@@ -72,27 +79,40 @@ const getRandomColor = () => {
   return colorArray[Math.floor(Math.random() * colorArray.length)];
 };
 
-const generateEmptyGrid = () => {
-  const rows = [];
-  for (let i = 0; i < numRows; i++) {
-    rows.push(Array.from(Array(numCols), () => 0));
-  }
-
-  return rows;
-};
-
 const App = () => {
+  const [numRows, setNumRows] = useState(35);
+  const [numCols, setNumCols] = useState(35);
+
+  const generateEmptyGrid = () => {
+    const rows = [];
+    for (let i = 0; i < numRows; i++) {
+      rows.push(Array.from(Array(numCols), () => 0));
+    }
+
+    return rows;
+  };
+
   const [grid, setGrid] = useState(() => {
     return generateEmptyGrid();
   });
 
   const [running, setRunning] = useState(false);
+  const [speed, setSpeed] = useState(500);
+  const changeSpeed = (val) => {
+    setSpeed(val);
+    return speed;
+  };
 
   const runningRef = useRef(running);
   runningRef.current = running;
+  const [generation, setGeneration] = useState(0);
+  let gen = 0;
 
-  const runSimulation = useCallback(() => {
+  const runSimulation = useCallback((speed) => {
+    let s = speed;
+
     if (!runningRef.current) {
+      gen = 0;
       return;
     }
 
@@ -101,6 +121,7 @@ const App = () => {
         for (let i = 0; i < numRows; i++) {
           for (let k = 0; k < numCols; k++) {
             let neighbors = 0;
+
             operations.forEach(([x, y]) => {
               const newI = i + x;
               const newK = k + y;
@@ -118,94 +139,208 @@ const App = () => {
         }
       });
     });
-
-    setTimeout(runSimulation, 200);
+    gen++;
+    const genUp = () => {
+      setGeneration(gen);
+    };
+    genUp();
+    setTimeout(() => {
+      runSimulation(speed);
+    }, s);
   }, []);
-  console.log(grid)
+  const insetAutomata = (automata, arr) =>
+    arr.map((val, index) =>
+      val.map((subVal, subIndex) => {
+        if (automata[index] && automata[index][subIndex])
+          return automata[index][subIndex];
+        return subVal;
+      })
+    );
+
   return (
     <>
-      <button
-        onClick={() => {
-          setRunning(!running);
-          if (!running) {
-            runningRef.current = true;
-            runSimulation();
-          }
-        }}
-      >
-        {running ? "stop" : "start"}
-      </button>
-      <button onClick={() => {
-        setGrid(pulsar)
-      }}>pulsar</button>
-      <button onClick={() => {
-        setGrid(pentaDecathlon)
-      }}>penta decathlon</button>
-      <button onClick={() => {
-        setGrid(oscillators)
-      }}>other oscillators</button>
-      <button onClick={() => {
-        setGrid(stills)
-      }}>stills</button>
-      <button onClick={() => {
-        setGrid(glider)
-      }}>glider</button>
-      <button onClick={() => {
-        setGrid(lwss)
-      }}>lwss</button>
-      <button onClick={() => {
-        setGrid(mwss)
-      }}>mwss</button>
-      <button onClick={() => {
-        setGrid(hwss)
-      }}>hwss</button>
-      <button
-        onClick={() => {
-          const rows = [];
-          for (let i = 0; i < numRows; i++) {
-            rows.push(
-              Array.from(Array(numCols), () => (Math.random() > 0.5 ? 1 : 0))
-            );
-          }
-
-          setGrid(rows);
-        }}
-      >
-        random
-      </button>
-      <button
-        onClick={() => {
-          setGrid(generateEmptyGrid());
-        }}
-      >
-        clear
-      </button>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: `repeat(${numCols}, 20px)`,
-        }}
-      >
-        {grid.map((rows, i) =>
-          rows.map((col, k) => (
-            <div
-              key={`${i}-${k}`}
-              onClick={() => {
-                const newGrid = produce(grid, (gridCopy) => {
-                  gridCopy[i][k] = grid[i][k] ? 0 : 1;
-                });
-                setGrid(newGrid);
-              }}
-              style={{
-                width: 20,
-                height: 20,
-                backgroundColor: grid[i][k] ? 'red' : undefined,
-                border: '1px solid grey'
-              }}
-            />
-          ))
-        )}
+      <div className="white">Conway's Game of Life</div>
+      <div className="generations">
+        <div className="white">generation: {generation}</div>
       </div>
+      <div className="controls">
+        <button
+          onClick={() => {
+            setRunning(!running);
+            if (!running) {
+              runningRef.current = true;
+              runSimulation(speed);
+            }
+          }}
+        >
+          {running ? "stop" : "start"}
+        </button>
+        <button
+          onClick={() => {
+            setGrid(generateEmptyGrid());
+            setGeneration(0);
+            gen = 0;
+          }}
+        >
+          clear
+        </button>
+      </div>
+      <div className="flex-cols">
+        <div className="grid">
+          {" "}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: `repeat(${numCols}, 20px)`,
+            }}
+          >
+            {grid.map((rows, i) =>
+              rows.map((col, k) => (
+                <div
+                  key={`${i}-${k}`}
+                  onClick={() => {
+                    if (!running) {
+                      const newGrid = produce(grid, (gridCopy) => {
+                        gridCopy[i][k] = grid[i][k] ? 0 : 1;
+                      });
+                      setGrid(newGrid);
+                    } else {
+                      return;
+                    }
+                  }}
+                  style={{
+                    width: 20,
+                    height: 20,
+                    backgroundColor: grid[i][k] ? "red" : undefined,
+                    border: "1px solid grey",
+                  }}
+                />
+              ))
+            )}
+          </div>
+        </div>
+        <div className="toggles">
+          <button
+            onClick={() => {
+              if (!running) {
+                const rows = [];
+                for (let i = 0; i < numRows; i++) {
+                  rows.push(
+                    Array.from(Array(numCols), () =>
+                      Math.random() > 0.5 ? 1 : 0
+                    )
+                  );
+                }
+                setGrid(rows);
+              } else {
+                return;
+              }
+            }}
+          >
+            random
+          </button>
+          <div className="white">Oscillators</div>
+          <button
+            onClick={() => {
+              if (!running) {
+                setGrid(insetAutomata(pulsar, grid));
+              } else {
+                return;
+              }
+            }}
+          >
+            pulsar
+          </button>
+          <button
+            onClick={() => {
+              if (!running) {
+                setGrid(insetAutomata(pentaDecathlon, grid));
+              } else {
+                return;
+              }
+            }}
+          >
+            penta decathlon
+          </button>
+          <button
+            onClick={() => {
+              if (!running) {
+                setGrid(insetAutomata(oscillators, grid));
+              } else {
+                return;
+              }
+            }}
+          >
+            other oscillators
+          </button>
+          <div className="white">Stills</div>
+          <button
+            onClick={() => {
+              if (!running) {
+                setGrid(insetAutomata(stills, grid));
+              } else {
+                return;
+              }
+            }}
+          >
+            stills
+          </button>
+          <div className="white">Gliders</div>
+          <button
+            onClick={() => {
+              if (!running) {
+                setGrid(insetAutomata(glider, grid));
+              } else {
+                return;
+              }
+            }}
+          >
+            glider
+          </button>
+          <button
+            onClick={() => {
+              if (!running) {
+                setGrid(insetAutomata(lwss, grid));
+              } else {
+                return;
+              }
+            }}
+          >
+            lwss
+          </button>
+          <button
+            onClick={() => {
+              if (!running) {
+                setGrid(insetAutomata(mwss, grid));
+              } else {
+                return;
+              }
+            }}
+          >
+            mwss
+          </button>
+          <button
+            onClick={() => {
+              if (!running) {
+                setGrid(insetAutomata(hwss, grid));
+              } else {
+                return;
+              }
+            }}
+          >
+            hwss
+          </button>
+          <div className="white">Speeds</div>
+          <button onClick={() => changeSpeed(25)}>hyper mode</button>
+          <button onClick={() => changeSpeed(100)}>fast mode</button>
+          <button onClick={() => changeSpeed(500)}>normal mode</button>
+          <button onClick={() => changeSpeed(1000)}>slow mode</button>
+          <button onClick={() => changeSpeed(5000)}>snail mode</button>
+        </div>
+        <div className="rules white"><Rules /></div>
+      </div>
+      
+      <div className="about"></div>
     </>
   );
 };
